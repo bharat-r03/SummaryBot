@@ -1,10 +1,10 @@
 from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import HTMLResponse, FileResponse, Response
+from fastapi.responses import HTMLResponse, Response
 from summarize.summarize import create_chunked_summary, create_main_summary
 from audio.audio import text_to_audio
-import soundfile as sf
 import uuid
 import os
+import shutil
 
 
 MODEL_NAME = "gemma3:4b"
@@ -13,7 +13,7 @@ SPEAKER_VOICE = "af_heart"
 app = FastAPI()
 
 
-@app.post("/test/")
+@app.post("/generate/")
 async def generate_audio(files: list[UploadFile]):
     if not os.path.exists("tmpfiles"):
         os.mkdir("tmpfiles")
@@ -37,8 +37,10 @@ async def generate_audio(files: list[UploadFile]):
 
     for fpath in fpaths:
         os.remove(fpath)
+    if os.path.exists("tmpfiles"):
+        shutil.rmtree("tmpfiles")
 
-    headers = {'Content-Disposition': f'attachment; filename="test.wav"'}
+    headers = {'Content-Disposition': 'attachment; filename="test.wav"'}
     return Response(summary_audio_bytes, headers=headers, media_type="audio/wav")
 
 
@@ -46,7 +48,7 @@ async def generate_audio(files: list[UploadFile]):
 async def main():
     content = """
         <body>
-        <form action="/test/" enctype="multipart/form-data" method="post">
+        <form action="/generate/" enctype="multipart/form-data" method="post">
         <input name="files" type="file" multiple>
         <input type="submit">
         </form>
