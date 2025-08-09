@@ -1,0 +1,89 @@
+<script setup lang="ts">
+import { PhCloudArrowUp } from '@phosphor-icons/vue';
+import { ref } from 'vue'
+import {
+Listbox,
+ListboxButton,
+ListboxOptions,
+ListboxOption,
+} from '@headlessui/vue'
+import { CheckIcon, ChevronUpDownIcon } from "@heroicons/vue/20/solid"
+
+const voices = [
+    "Female",
+    "Male"
+]
+const selectedVoice = ref(voices[0])
+
+const types = [
+    "Summary",
+    "Podcast"
+]
+const selectedType = ref(types[0])
+</script>
+
+<template>
+    <div className="h-3/4 w-1/2 rounded-xl shadow-xl bg-white flex flex-col items-center justify-center">
+        <h3 className="text-2xl font-bold my-3 mx-5 text-center">Audio Summary Converter</h3>
+        <p className="text-gray-500 text-center mb-5">Convert uploaded files into an audio summary or podcast</p>
+        <form action="/generate" enctype="multipart/form-data" method="post" className="flex flex-col items-center justify-center w-full h-4/7">
+            <div className="flex flex-row w-2/3 h-1/7 border-1 border-gray-300 rounded-lg items-center mb-5 min-h-10">
+                <label for="files" className="text-gray-500 pl-5 text-2xl"><PhCloudArrowUp /></label>
+                <input className="w-full file:pl-3 file:pr-2 file:text-base file:font-medium file:text-gray-500 dark:font-light dark:text-sm dark:text-gray-400 dark:mr-5" name="files" type="file" multiple>
+            </div>
+            <div className="flex flex-col w-2/3 h-1/5 mb-5">
+                <label for="voice" className="text-black font-medium mb-2">Speaker voice</label>
+                <Listbox v-model="selectedVoice" name="voice" id="voice">
+                    <div class="relative h-full">
+                        <ListboxButton class="relative w-full h-full cursor-default rounded-lg bg-white py-2 pl-5 pr-10 text-left border-gray-300 border-1">
+                            <span class="block truncate text-base font-normal">{{ selectedVoice }}</span>
+                            <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                            </span>
+                        </ListboxButton>
+
+                        <transition leave-active-class="transition duration-100 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
+                            <ListboxOptions class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                                    <ListboxOption v-slot="{ active, selected }" v-for="voice in voices" :key="voice" :value="voice" as="template">
+                                        <li :class="[ active ? 'bg-gray-200 text-gray-600' : 'text-gray-600', 'relative cursor-default select-none py-2 pl-10 pr-4', ]">
+                                            <span :class="[ selected ? 'font-medium' : 'font-normal', 'block truncate', ]">{{ voice }}</span>
+                                            <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                                                <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                                            </span>
+                                        </li>
+                                    </ListboxOption>
+                            </ListboxOptions>
+                        </transition>
+                    </div>
+                </Listbox>
+            </div>
+            <div className="flex flex-col w-2/3 h-1/5 mb-5">
+                <label for="type" className="text-black font-medium mb-2">Summary Type</label>
+                <Listbox v-model="selectedType" name="type" id="type">
+                    <div class="relative h-full">
+                        <ListboxButton class="relative w-full h-full cursor-default rounded-lg bg-white py-2 pl-5 pr-10 text-left border-gray-300 border-1">
+                            <span class="block truncate text-base font-normal">{{ selectedType }}</span>
+                            <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                            </span>
+                        </ListboxButton>
+
+                        <transition leave-active-class="transition duration-100 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
+                            <ListboxOptions class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+                                    <ListboxOption v-slot="{ active, selected }" v-for="type in types" :key="type" :value="type" as="template">
+                                        <li :class="[ active ? 'bg-gray-200 text-gray-600' : 'text-gray-600', 'relative cursor-default select-none py-2 pl-10 pr-4', ]">
+                                            <span :class="[ selected ? 'font-medium' : 'font-normal', 'block truncate', ]">{{ type }}</span>
+                                            <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                                                <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                                            </span>
+                                        </li>
+                                    </ListboxOption>
+                            </ListboxOptions>
+                        </transition>
+                    </div>
+                </Listbox>
+            </div>
+            <input type="submit" className="w-2/3 h-1/7 min-h-10 bg-blue-500 text-white font-medium rounded-lg my-3" value="Generate audio summary">
+        </form>
+    </div>
+</template>
