@@ -13,7 +13,7 @@ SPEAKER_VOICE = "af_heart"
 app = FastAPI()
 
 
-@app.post("/generate/")
+@app.post("/generate")
 async def generate_audio(files: list[UploadFile]):
     if not os.path.exists("tmpfiles"):
         os.mkdir("tmpfiles")
@@ -48,7 +48,7 @@ async def generate_audio(files: list[UploadFile]):
 async def main():
     content = """
         <body>
-        <form action="/generate/" enctype="multipart/form-data" method="post">
+        <form action="/generate" enctype="multipart/form-data" method="post">
         <input name="files" type="file" multiple>
         <input type="submit">
         </form>
