@@ -1,10 +1,13 @@
-from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import HTMLResponse, Response
+from fastapi import FastAPI, File, UploadFile, Request, Form
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from summarize.summarize import create_chunked_summary, create_main_summary
 from audio.audio import text_to_audio
 import uuid
 import os
 import shutil
+from typing import Annotated
+import base64
 
 
 MODEL_NAME = "gemma3:4b"
@@ -12,9 +15,30 @@ SPEAKER_VOICE = "af_heart"
 
 app = FastAPI()
 
+origins = [
+    "http://localhost",
+    "http://localhost:5173"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
+
+
+@app.post("/generate-test")
+async def generate_audio_test(files: list[UploadFile], voice: Annotated[str, Form()], type: Annotated[str, Form()]):
+    sample_audio_path = "C:/Dev/SummaryBot/notebooks/audio_processing/test.wav"
+    with open(sample_audio_path, "rb") as audio_file:
+        file = audio_file.read()
+    
+    return base64.b64encode(file)
 
 @app.post("/generate")
-async def generate_audio(files: list[UploadFile]):
+async def generate_audio(files: list[UploadFile], voice: Annotated[str, Form()], type: Annotated[str, Form()]):
     if not os.path.exists("tmpfiles"):
         os.mkdir("tmpfiles")
 
@@ -42,16 +66,3 @@ async def generate_audio(files: list[UploadFile]):
 
     headers = {'Content-Disposition': 'attachment; filename="test.wav"'}
     return Response(summary_audio_bytes, headers=headers, media_type="audio/wav")
-
-
-@app.get("/")
-async def main():
-    content = """
-        <body>
-        <form action="/generate" enctype="multipart/form-data" method="post">
-        <input name="files" type="file" multiple>
-        <input type="submit">
-        </form>
-        </body>
-    """
-    return HTMLResponse(content=content)
