@@ -9,6 +9,7 @@ ListboxOption,
 } from '@headlessui/vue'
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/vue/20/solid"
 import axios from 'axios';
+import { audioBytes } from './varStore';
 
 const voices = [
     "Female",
@@ -18,14 +19,13 @@ const selectedVoice = ref(voices[0])
 
 const types = [
     "Summary",
-    "Podcast"
 ]
 const selectedType = ref(types[0])
 
 const isDisabled = ref(false);
 
 const apiClient = axios.create({
-    baseURL: "http://127.0.0.1:8000/generate-test",
+    baseURL: "http://127.0.0.1:8000/generate",
     withCredentials: false,
     headers: {
         "Content-Type": "multipart/form-data"
@@ -42,24 +42,30 @@ const appendFiles = (uploaded_files: FileList) => {
 };
 
 const submitForm = () => {
-    if (isDisabled.value) return;
-    isDisabled.value = true;
- 
-    let formData = new FormData();
-    for (var x=0; x<formState.files.length; x++) {
-        formData.append("files", formState.files[x]);
-    }
-    formData.append("voice", selectedVoice.value);
-    formData.append("type", selectedType.value);
+    try {
+        if (isDisabled.value) return;
+        isDisabled.value = true;
     
-    apiClient.post('', formData)
-        .then((response) => {
-            console.log("API was called succesfully! " + response.data);
-            isDisabled.value = false;
-        })
-        .catch((error) => {
+        let formData = new FormData();
+        for (var x=0; x<formState.files.length; x++) {
+            formData.append("files", formState.files[x]);
+        }
+        formData.append("voice", selectedVoice.value);
+        formData.append("type", selectedType.value);
+        
+        apiClient.post('', formData)
+            .then((response) => {
+                console.log("API was called succesfully!");
+
+                audioBytes.bytes = Uint8Array.from(atob(response.data), c => c.charCodeAt(0));
+                isDisabled.value = false;
+            });
+        } catch (error) {
             console.log(error);
-        });
+            if (isDisabled.value) {
+                isDisabled.value = false;
+            };
+        };
 }
 
 

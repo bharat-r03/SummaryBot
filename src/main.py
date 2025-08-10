@@ -1,6 +1,6 @@
 from fastapi import FastAPI, File, UploadFile, Request, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response
+from fastapi.responses import Response, StreamingResponse, FileResponse
 from summarize.summarize import create_chunked_summary, create_main_summary
 from audio.audio import text_to_audio
 import uuid
@@ -33,9 +33,11 @@ app.add_middleware(
 async def generate_audio_test(files: list[UploadFile], voice: Annotated[str, Form()], type: Annotated[str, Form()]):
     sample_audio_path = "C:/Dev/SummaryBot/notebooks/audio_processing/test.wav"
     with open(sample_audio_path, "rb") as audio_file:
-        file = audio_file.read()
+        summary_audio_bytes = audio_file.read()
     
-    return base64.b64encode(file)
+    summary_audio_bytes = base64.b64encode(summary_audio_bytes).decode("utf-8")
+    headers = {'Content-Disposition': 'attachment; filename="test.wav"'}
+    return Response(summary_audio_bytes, headers=headers, media_type="audio/wav")
 
 @app.post("/generate")
 async def generate_audio(files: list[UploadFile], voice: Annotated[str, Form()], type: Annotated[str, Form()]):
@@ -64,5 +66,6 @@ async def generate_audio(files: list[UploadFile], voice: Annotated[str, Form()],
     if os.path.exists("tmpfiles"):
         shutil.rmtree("tmpfiles")
 
+    summary_audio_bytes = base64.b64encode(summary_audio_bytes).decode("utf-8")
     headers = {'Content-Disposition': 'attachment; filename="test.wav"'}
     return Response(summary_audio_bytes, headers=headers, media_type="audio/wav")
