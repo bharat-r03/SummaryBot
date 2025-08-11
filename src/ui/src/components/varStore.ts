@@ -1,5 +1,5 @@
 import { reactive } from "vue";
 
 export const audioBytes = reactive({
-    bytes: null
+    bytes: null as Uint8Array | null
 })

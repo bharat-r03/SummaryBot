@@ -25,7 +25,7 @@ const selectedType = ref(types[0])
 const isDisabled = ref(false);
 
 const apiClient = axios.create({
-    baseURL: "http://127.0.0.1:8000/generate",
+    baseURL: "http://127.0.0.1:8000/generate-test",
     withCredentials: false,
     headers: {
         "Content-Type": "multipart/form-data"
@@ -34,8 +34,16 @@ const apiClient = axios.create({
 });
 
 const formState = reactive({
-    files: null
+    files: null as FileList | null
 });
+
+const handleInput = (event: Event) => {
+    let files = (event.target as HTMLInputElement).files;
+
+    if (files != null) {
+        appendFiles(files);
+    }
+};
 
 const appendFiles = (uploaded_files: FileList) => {
     formState.files = uploaded_files;
@@ -47,8 +55,11 @@ const submitForm = () => {
         isDisabled.value = true;
     
         let formData = new FormData();
-        for (var x=0; x<formState.files.length; x++) {
-            formData.append("files", formState.files[x]);
+        
+        if (formState.files != null) {
+            for (var x=0; x<formState.files.length; x++) {
+                formData.append("files", formState.files[x]);
+            }
         }
         formData.append("voice", selectedVoice.value);
         formData.append("type", selectedType.value);
@@ -78,7 +89,7 @@ const submitForm = () => {
         <form enctype="multipart/form-data" method="post" className="flex flex-col items-center justify-center w-full h-4/7" v-on:submit.prevent="submitForm">
             <div className="flex flex-row w-2/3 h-1/7 border-1 border-gray-300 rounded-lg items-center mb-5 min-h-10">
                 <label for="files" className="text-gray-500 pl-5 text-2xl"><PhCloudArrowUp /></label>
-                <input className="w-full file:pl-3 file:pr-2 file:text-base file:font-medium file:text-gray-500 dark:font-light dark:text-sm dark:text-gray-400 dark:mr-5" name="files" type="file" @change="appendFiles($event.target.files)" multiple>
+                <input className="w-full file:pl-3 file:pr-2 file:text-base file:font-medium file:text-gray-500 dark:font-light dark:text-sm dark:text-gray-400 dark:mr-5" name="files" type="file" @input="handleInput" multiple>
             </div>
             <div className="flex flex-col w-2/3 h-1/5 mb-5">
                 <label for="voice" className="text-black font-medium mb-2">Speaker voice</label>
