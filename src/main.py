@@ -11,7 +11,11 @@ import base64
 
 
 MODEL_NAME = "gemma3:4b"
-SPEAKER_VOICE = "af_heart"
+VOICE_DICT = {
+    "female": "af_heart",
+    "male": "am_michael"
+}
+
 
 app = FastAPI()
 
@@ -39,6 +43,7 @@ async def generate_audio_test(files: list[UploadFile], voice: Annotated[str, For
     headers = {'Content-Disposition': 'attachment; filename="test.wav"'}
     return Response(summary_audio_bytes, headers=headers, media_type="audio/wav")
 
+
 @app.post("/generate")
 async def generate_audio(files: list[UploadFile], voice: Annotated[str, Form()], type: Annotated[str, Form()]):
     if not os.path.exists("tmpfiles"):
@@ -58,8 +63,8 @@ async def generate_audio(files: list[UploadFile], voice: Annotated[str, Form()],
         file_summary = create_chunked_summary(fpath, model_name=MODEL_NAME)
         chunk_summaries.append(file_summary)
 
-    main_summary = create_main_summary(chunk_summaries, model_name=MODEL_NAME)
-    summary_audio_bytes = text_to_audio(script_text=main_summary, speaker_voice=SPEAKER_VOICE)
+    main_summary = create_main_summary(chunk_summaries, model_name=MODEL_NAME, summary_type=type.lower())
+    summary_audio_bytes = text_to_audio(script_text=main_summary, speaker_voice=VOICE_DICT[voice.lower()])
 
     for fpath in fpaths:
         os.remove(fpath)
