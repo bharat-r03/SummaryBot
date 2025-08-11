@@ -2,13 +2,12 @@
 
 import { PhLegoSmiley } from '@phosphor-icons/vue';
 import { audioBytes } from './varStore';
-import { ref } from 'vue';
 
 let url = "";
 
 const isAudioPresent = () => {
-    if (audioBytes.bytes != null) {
-        var wav = new Blob([audioBytes.bytes], { type: 'audio/wav' });
+    if (audioBytes.bytes != null && audioBytes.bytes instanceof Uint8Array) {
+        var wav = new Blob([audioBytes.bytes as BlobPart], { type: 'audio/wav' });
         url = window.URL.createObjectURL(wav);
 
         return true;
