@@ -1,9 +1,33 @@
 services:
   frontend:
-    image: summarybot/vue-app
+    build:
+      context: ./src/ui
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
   
   backend:
-    image: summarybot/backend
+    build:
+      context: ./src/app
+      dockerfile: Dockerfile
     network_mode: "host"
+
+  ollama:
+    build:
+      context: ./src/ollama
+      dockerfile: Dockerfile
+    ports:
+      - "11434:11434"
+    environment:
+      - OLLAMA_MODELS=/root/.ollama
+    healthcheck:
+      test: "ollama --version && ollama ps || exit 1"
+      interval: 300s
+      timeout: 60s
+      retries: 3
+      start_period: 30s
+    volumes:
+      - ollama:/root/.ollama
+
+volumes:
+  ollama:
