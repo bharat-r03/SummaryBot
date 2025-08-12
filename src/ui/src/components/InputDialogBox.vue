@@ -25,7 +25,7 @@ const selectedType = ref(types[0])
 const isDisabled = ref(false);
 
 const apiClient = axios.create({
-    baseURL: "http://127.0.0.1:8000/generate-test",
+    baseURL: "http://127.0.0.1:8000/generate",
     withCredentials: false,
     headers: {
         "Content-Type": "multipart/form-data"

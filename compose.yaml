@@ -1,0 +1,9 @@
+services:
+  frontend:
+    image: summarybot/vue-app
+    ports:
+      - "8080:8080"
+  
+  backend:
+    image: summarybot/backend
+    network_mode: "host"
