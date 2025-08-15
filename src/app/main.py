@@ -8,9 +8,14 @@ import os
 import shutil
 from typing import Annotated
 import base64
+import ollama
 
 
-MODEL_NAME = "gemma3:4b"
+MODEL_DICT = {
+    "Gemma 3 - 4B": "gemma3:4b",
+    "Llama 3.2 - 3B": "llama3.2:3b"
+}
+
 VOICE_DICT = {
     "female": "af_heart",
     "male": "am_michael"
@@ -36,7 +41,7 @@ app.add_middleware(
 
 
 @app.post("/generate-test")
-async def generate_audio_test(files: list[UploadFile], voice: Annotated[str, Form()], type: Annotated[str, Form()]):
+async def generate_audio_test(files: list[UploadFile], voice: Annotated[str, Form()], summary_type: Annotated[str, Form()], model: Annotated[str, Form()]):
     sample_audio_path = "C:/Dev/SummaryBot/notebooks/audio_processing/test.wav"
     with open(sample_audio_path, "rb") as audio_file:
         summary_audio_bytes = audio_file.read()
@@ -47,9 +52,14 @@ async def generate_audio_test(files: list[UploadFile], voice: Annotated[str, For
 
 
 @app.post("/generate")
-async def generate_audio(files: list[UploadFile], voice: Annotated[str, Form()], type: Annotated[str, Form()]):
+async def generate_audio(files: list[UploadFile], voice: Annotated[str, Form()], summary_type: Annotated[str, Form()], model: Annotated[str, Form()]):
     if not os.path.exists("tmpfiles"):
         os.mkdir("tmpfiles")
+
+    model_name = MODEL_DICT[model]
+    current_model_list = [model["model"] for model in ollama.list().models]
+    if not model_name in current_model_list:
+        ollama.pull(model_name)
 
     fpaths = []
     for file in files:
@@ -62,10 +72,10 @@ async def generate_audio(files: list[UploadFile], voice: Annotated[str, Form()],
 
     for idx, fpath in enumerate(fpaths):
         print(f"Now processing file #{idx+1}!")
-        file_summary = create_chunked_summary(fpath, model_name=MODEL_NAME)
+        file_summary = create_chunked_summary(fpath, model_name=model_name)
         chunk_summaries.append(file_summary)
 
-    main_summary = create_main_summary(chunk_summaries, model_name=MODEL_NAME, summary_type=type.lower())
+    main_summary = create_main_summary(chunk_summaries, model_name=model_name, summary_type=summary_type.lower())
     summary_audio_bytes = text_to_audio(script_text=main_summary, speaker_voice=VOICE_DICT[voice.lower()])
 
     for fpath in fpaths:
