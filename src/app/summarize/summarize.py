@@ -1,4 +1,4 @@
-from ollama import pull, generate
+from ollama import generate
 import math
 from processing.file_preprocess import process_pdf
 from .summarize_utils import chunk_input, get_file_ext
