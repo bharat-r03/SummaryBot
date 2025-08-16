@@ -9,7 +9,7 @@ ListboxOption,
 } from '@headlessui/vue'
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/vue/20/solid"
 import axios from 'axios';
-import { audioBytes } from './varStore';
+import { audioBytes, isPressed, stageCompletion } from './varStore';
 
 
 const voices = [
@@ -29,8 +29,6 @@ const models = [
 ]
 
 const selectedModel = ref(models[0])
-
-const isDisabled = ref(false);
 
 const apiClient = axios.create({
     baseURL: "http://127.0.0.1:8000/generate",
@@ -59,8 +57,18 @@ const appendFiles = (uploaded_files: FileList) => {
 
 const submitForm = () => {
     try {
-        if (isDisabled.value) return;
-        isDisabled.value = true;
+        if (isPressed.value) return;
+        isPressed.value = true;
+
+        stageCompletion.load_model = false;
+        stageCompletion.process_files = false;
+        stageCompletion.summarize_files = false;
+        stageCompletion.summarize_main = false;
+        stageCompletion.text_to_audio = false;
+        stageCompletion.processing_complete = false;
+
+
+        audioBytes.bytes = null;
     
         let formData = new FormData();
         
@@ -78,15 +86,21 @@ const submitForm = () => {
                 console.log("API was called succesfully!");
 
                 audioBytes.bytes = Uint8Array.from(atob(response.data), c => c.charCodeAt(0));
-                isDisabled.value = false;
+                isPressed.value = false;
+            })
+            .catch(() => {
+                if (isPressed.value) {
+                    isPressed.value = false;
+                }
             });
         } catch (error) {
             console.log(error);
-            if (isDisabled.value) {
-                isDisabled.value = false;
+            if (isPressed.value) {
+                isPressed.value = false;
             };
         };
 }
+
 
 
 </script>
@@ -178,7 +192,7 @@ const submitForm = () => {
                     </div>
                 </Listbox>
             </div>
-            <input type="submit" :class="[isDisabled ? 'bg-gray-500' : 'bg-blue-500', 'w-2/3 h-1/7 min-h-10 text-white font-medium rounded-lg my-3', ]" value="Generate audio summary">
+            <input type="submit" :class="[isPressed ? 'bg-gray-500' : 'bg-blue-500', 'w-2/3 h-1/7 min-h-10 text-white font-medium rounded-lg my-3', ]" value="Generate audio summary">
         </form>
     </div>
 </template>
