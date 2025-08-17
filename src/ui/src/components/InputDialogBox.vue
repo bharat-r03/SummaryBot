@@ -31,7 +31,7 @@ const models = [
 const selectedModel = ref(models[0])
 
 const apiClient = axios.create({
-    baseURL: "http://127.0.0.1:8000/generate",
+    baseURL: "http://127.0.0.1:8000/generate-test",
     withCredentials: false,
     headers: {
         "Content-Type": "multipart/form-data"
@@ -111,8 +111,8 @@ const submitForm = () => {
         <p className="text-gray-500 text-center mb-5">Convert uploaded files into an audio summary or podcast</p>
         <form enctype="multipart/form-data" method="post" className="flex flex-col items-center justify-center w-full h-4/7" v-on:submit.prevent="submitForm">
             <div className="flex flex-row w-2/3 h-1/7 border-1 border-gray-300 rounded-lg items-center mb-5 min-h-10">
-                <label for="files" className="text-gray-500 pl-5 text-2xl"><PhCloudArrowUp /></label>
-                <input className="w-full file:pl-3 file:pr-2 file:text-base file:font-medium file:text-gray-500 dark:font-light dark:text-sm dark:text-gray-400 dark:mr-5" name="files" type="file" @input="handleInput" multiple>
+                <label for="files" className="h-full flex items-center text-gray-500 pl-5 text-2xl cursor-pointer"><PhCloudArrowUp /></label>
+                <input className="file:h-full dark:h-full w-full flex flex-col items-center file:cursor-pointer file:pl-3 file:pr-2 file:text-base file:font-medium file:text-gray-500 dark:cursor-pointer dark:font-light dark:text-sm dark:text-gray-400 dark:mr-3" name="files" type="file" id="files" @input="handleInput" multiple>
             </div>
             <div className="flex flex-col w-2/3 h-1/5 mb-5">
                 <label for="voice" className="text-black font-medium mb-2">Speaker Voice</label>
@@ -192,7 +192,7 @@ const submitForm = () => {
                     </div>
                 </Listbox>
             </div>
-            <input type="submit" :class="[isPressed ? 'bg-gray-500' : 'bg-blue-500', 'w-2/3 h-1/7 min-h-10 text-white font-medium rounded-lg my-3', ]" value="Generate audio summary">
+            <input type="submit" :class="[isPressed ? 'bg-gray-500 cursor-default' : 'bg-blue-500 cursor-pointer', 'w-2/3 h-1/7 min-h-10 text-white font-medium rounded-lg my-3', ]" value="Generate audio summary">
         </form>
     </div>
 </template>
