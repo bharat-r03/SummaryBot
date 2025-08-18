@@ -19,4 +19,4 @@ export const stageCompletion = reactive({
 })
 
 
-export const isDarkMode = ref(true);
+export const isDarkMode = ref(false);
