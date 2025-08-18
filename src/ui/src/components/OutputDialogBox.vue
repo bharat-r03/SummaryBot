@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import { PhLegoSmiley } from '@phosphor-icons/vue';
-import { audioBytes, isPressed, wasPressed, stageCompletion } from './varStore';
+import { audioBytes, isPressed, wasPressed, stageCompletion, isDarkMode } from './varStore';
 import { ref } from "vue";
 
 let url = "";
@@ -82,16 +82,24 @@ eventSource.addEventListener("stageUpdate", function (event) {
     }
 });
 
+
+const onDarkModeToggle = () => {
+    if (isDarkMode.value == true) {
+        isDarkMode.value = false;
+    } else {
+        isDarkMode.value = true;
+    };
+};
 </script>
 
 <template>
-    <div className="h-7/8 w-1/2 rounded-xl shadow-xl bg-white flex flex-col items-center justify-center">
+    <div :class="[ isDarkMode ? 'bg-gray-800' : 'bg-white', 'h-7/8 w-1/2 rounded-xl shadow-xl flex flex-col items-center justify-center' ]">
         <template v-if="onPress()">
             <div className="h-95/100 w-95/100 flex flex-col items-center justify-center">
-                <h3 v-if="stageCompletion.processing_complete == false" className="text-2xl font-light mb-5 mx-5 text-center">Generating Output...</h3>
-                <h3 v-if="stageCompletion.processing_complete == true" className="text-2xl font-bold mb-5 mx-5 text-center">Output Generated!</h3>
+                <h3 v-if="stageCompletion.processing_complete == false" :class="[ isDarkMode ? 'text-white' : 'text-black', 'text-2xl font-light mb-5 mx-5 text-center' ]">Generating Output...</h3>
+                <h3 v-if="stageCompletion.processing_complete == true" :class="[ isDarkMode ? 'text-white' : 'text-black', 'text-2xl font-bold mb-5 mx-5 text-center' ]">Output Generated!</h3>
 
-                <div id="load-model-stage" className="flex flex-row my-3 items-center justify-center">
+                <div id="load-model-stage" :class="[ isDarkMode ? 'text-white' : 'text-black', 'flex flex-row my-3 items-center justify-center' ]">
                     <svg v-if="stageCompletion.load_model == true" class="w-4 h-4 me-2 text-green-500 dark:text-green-400 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
                     </svg>
@@ -99,7 +107,7 @@ eventSource.addEventListener("stageUpdate", function (event) {
             
                     <span :class="[ stageCompletion.load_model ? 'font-medium' : 'font-normal' ]">Loading Model...</span>
                 </div>
-                <div id="process-files-stage" className="flex flex-row my-3 items-center justify-center">
+                <div id="process-files-stage" :class="[ isDarkMode ? 'text-white' : 'text-black', 'flex flex-row my-3 items-center justify-center' ]">
                     <svg v-if="stageCompletion.process_files == true" class="w-4 h-4 me-2 text-green-500 dark:text-green-400 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
                     </svg>
@@ -107,7 +115,7 @@ eventSource.addEventListener("stageUpdate", function (event) {
 
                     <span :class="[ stageCompletion.process_files ? 'font-medium' : 'font-normal' ]">Processing Files...</span>
                 </div>
-                <div id="summarize-files-stage" className="flex flex-row my-3 items-center justify-center">
+                <div id="summarize-files-stage" :class="[ isDarkMode ? 'text-white' : 'text-black', 'flex flex-row my-3 items-center justify-center' ]">
                     <svg v-if="stageCompletion.summarize_files == true" class="w-4 h-4 me-2 text-green-500 dark:text-green-400 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
                     </svg>
@@ -115,7 +123,7 @@ eventSource.addEventListener("stageUpdate", function (event) {
 
                     <span :class="[ stageCompletion.summarize_files ? 'font-medium' : 'font-normal' ]">Summarizing Individual Files...</span>
                 </div>
-                <div id="summarize-main-stage" className="flex flex-row my-3 items-center justify-center">
+                <div id="summarize-main-stage" :class="[ isDarkMode ? 'text-white' : 'text-black', 'flex flex-row my-3 items-center justify-center' ]">
                     <svg v-if="stageCompletion.summarize_main == true" class="w-4 h-4 me-2 text-green-500 dark:text-green-400 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
                     </svg>
@@ -123,7 +131,7 @@ eventSource.addEventListener("stageUpdate", function (event) {
 
                     <span :class="[ stageCompletion.summarize_main ? 'font-medium' : 'font-normal' ]">Creating Complete Summary...</span>
                 </div>
-                <div id="text-to-audio-stage" className="flex flex-row my-3 items-center justify-center">
+                <div id="text-to-audio-stage" :class="[ isDarkMode ? 'text-white' : 'text-black', 'flex flex-row my-3 items-center justify-center' ]">
                     <svg v-if="stageCompletion.text_to_audio == true" class="w-4 h-4 me-2 text-green-500 dark:text-green-400 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
                     </svg>
@@ -131,7 +139,7 @@ eventSource.addEventListener("stageUpdate", function (event) {
 
                     <span :class="[ stageCompletion.text_to_audio ? 'font-medium' : 'font-normal' ]">Converting Text to Audio...</span>
                 </div>
-                <div id="processing-complete-stage" className="flex flex-row my-3 items-center justify-center">
+                <div id="processing-complete-stage" :class="[ isDarkMode ? 'text-white' : 'text-black', 'flex flex-row my-3 items-center justify-center' ]">
                     <svg v-if="stageCompletion.processing_complete == true" class="w-4 h-4 me-2 text-green-500 dark:text-green-400 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
                     </svg>
@@ -145,10 +153,26 @@ eventSource.addEventListener("stageUpdate", function (event) {
             </div>
         </template>
         <template v-if="!onPress()">
-            <div :class="[ isAudioPresent() ? '' : 'border-1 rounded-xl border-gray-300 border-dashed', 'h-95/100 w-95/100 flex flex-col items-center justify-center', ]">
-                <PhLegoSmiley :size="96" color="#9CA3AF" weight="thin" v-if="!isAudioPresent()" />
-                <p className="my-5 text-gray-400 text-xl" v-if="!isAudioPresent()">Waiting for a task!</p>         
+            <div :class="[ isAudioPresent() ? '' : isDarkMode ? 'border-1 rounded-xl border-gray-500 border-dashed' : 'border-1 rounded-xl border-gray-300 border-dashed', 'h-95/100 w-95/100 flex flex-col items-center justify-center', ]">
+                <PhLegoSmiley :size="96" :class="[ isDarkMode ? 'text-gray-300' : 'text-gray-400' ]" weight="thin" v-if="!isAudioPresent()" />
+                <p :class="[ isDarkMode ? 'text-gray-300' : 'text-gray-400', 'my-5 text-xl' ]" v-if="!isAudioPresent()">Waiting for a task!</p>         
             </div>
         </template>
+    </div>
+    <div className="absolute top-2 right-2">
+        <div>
+            <input type="checkbox" name="light-switch" v-on:click="onDarkModeToggle()" class="light-switch sr-only" />
+            <label v-on:click="onDarkModeToggle()" :class="[ isDarkMode ? 'dark:bg-slate-700 dark:hover:bg-slate-600/80' : 'bg-slate-100 hover:bg-slate-200', 'flex items-center justify-center cursor-pointer w-8 h-8 rounded-full' ]" for="light-switch">
+            <svg :class="[ isDarkMode ? 'hidden' : 'w-4 h-4' ]" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+                <path class="fill-current text-slate-400" d="M7 0h2v2H7V0Zm5.88 1.637 1.414 1.415-1.415 1.413-1.414-1.414 1.415-1.414ZM14 7h2v2h-2V7Zm-1.05 7.433-1.415-1.414 1.414-1.414 1.415 1.413-1.414 1.415ZM7 14h2v2H7v-2Zm-4.02.363L1.566 12.95l1.415-1.414 1.414 1.415-1.415 1.413ZM0 7h2v2H0V7Zm3.05-5.293L4.465 3.12 3.05 4.535 1.636 3.121 3.05 1.707Z" />
+                <path class="fill-current text-slate-500" d="M8 4C5.8 4 4 5.8 4 8s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4Z" />
+            </svg>
+            <svg :class="[ isDarkMode ? 'w-4 h-4' : 'hidden' ]" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+                <path class="fill-current text-slate-400" d="M6.2 2C3.2 2.8 1 5.6 1 8.9 1 12.8 4.2 16 8.1 16c3.3 0 6-2.2 6.9-5.2C9.7 12.2 4.8 7.3 6.2 2Z" />
+                <path class="fill-current text-slate-500" d="M12.5 6a.625.625 0 0 1-.625-.625 1.252 1.252 0 0 0-1.25-1.25.625.625 0 1 1 0-1.25 1.252 1.252 0 0 0 1.25-1.25.625.625 0 1 1 1.25 0c.001.69.56 1.249 1.25 1.25a.625.625 0 1 1 0 1.25c-.69.001-1.249.56-1.25 1.25A.625.625 0 0 1 12.5 6Z" />
+            </svg>
+            <span class="sr-only">Switch to light / dark version</span>
+            </label>
+        </div>
     </div>
 </template>

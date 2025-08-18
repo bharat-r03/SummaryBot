@@ -17,3 +17,6 @@ export const stageCompletion = reactive({
     text_to_audio: false,
     processing_complete: false
 })
+
+
+export const isDarkMode = ref(false);
