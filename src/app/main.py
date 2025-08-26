@@ -77,34 +77,34 @@ async def generate_audio(files: list[UploadFile], voice: Annotated[str, Form()],
     if not os.path.exists("tmpfiles"):
         os.mkdir("tmpfiles")
 
-    await set_stage("load_model")
     model_name = MODEL_DICT[model]
     current_model_list = [model["model"] for model in ollama.list().models]
     if not model_name in current_model_list:
         ollama.pull(model_name)
+    await set_stage("load_model")
 
-    await set_stage("process_files")
     fpaths = []
     for file in files:
         fname = f"tmpfiles/tmp_file_{uuid.uuid4()}.pdf"
         with open(fname, "wb") as f:
             f.write(file.file.read())
         fpaths.append(fname)
+    await set_stage("process_files")
     
 
     chunk_summaries = []
-    await set_stage("summarize_files")
 
     for idx, fpath in enumerate(fpaths):
         print(f"Now processing file #{idx+1}!")
         file_summary = create_chunked_summary(fpath, model_name=model_name)
         chunk_summaries.append(file_summary)
+    await set_stage("summarize_files")
 
-    await set_stage("summarize_main")
     main_summary = create_main_summary(chunk_summaries, model_name=model_name, summary_type=summary_type.lower())
+    await set_stage("summarize_main")
 
-    await set_stage("text_to_audio")
     summary_audio_bytes = text_to_audio(script_text=main_summary, speaker_voice=VOICE_DICT[voice.lower()])
+    await set_stage("text_to_audio")
 
     for fpath in fpaths:
         os.remove(fpath)
