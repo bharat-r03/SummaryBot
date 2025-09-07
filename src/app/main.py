@@ -1,7 +1,7 @@
 from fastapi import FastAPI, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response, StreamingResponse
-from summarize.summarize import create_chunked_summary, create_main_summary
+from summarize.summarize import create_chunked_summaries, create_main_summary
 from audio.audio import text_to_audio
 import uuid
 import os
@@ -96,8 +96,8 @@ async def generate_audio(files: list[UploadFile], voice: Annotated[str, Form()],
 
     for idx, fpath in enumerate(fpaths):
         print(f"Now processing file #{idx+1}!")
-        file_summary = create_chunked_summary(fpath, model_name=model_name)
-        chunk_summaries.append(file_summary)
+        doc_summary_list = create_chunked_summaries(fpath, model_name=model_name)
+        chunk_summaries.append(doc_summary_list)
     await set_stage("summarize_files")
 
     main_summary = create_main_summary(chunk_summaries, model_name=model_name, summary_type=summary_type.lower())
